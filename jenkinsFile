@@ -1,0 +1,27 @@
+echo "hello world"
+
+node {
+    stage("checkout"){
+        sh "ls"
+        git branch:'main', url: "https://github.com/AFCFranco/course3-jenkins-gs-spring-petclinic.git"
+        sh "ls"
+    }
+    parallel testA:{
+        sh "echo test setA"
+        sleep 4
+    },testB:{
+        sh "echo test setB"
+        sleep 8
+    }
+    
+    
+    stage("build"){
+        sh "./mvnw package"
+    }
+    stage("capture"){
+        archiveArtifacts artifacts: '**/target/*.jar'
+    }
+     stage("uniteTest"){
+        junit stdioRetention: '', testResults: '**/target/surefire-reports/*.xml'
+    }
+}
